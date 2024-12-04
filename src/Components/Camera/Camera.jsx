@@ -43,7 +43,7 @@ const Camera = () => {
 
         setQrCode(qrCodeMessage); // Guardamos el código detectado
 
-        // setCodigoManual(qrCodeMessage); // Ponemos el código también en el input manual
+        setCodigoManual(qrCodeMessage); // Ponemos el código también en el input manual
 
         // Llamar a la búsqueda automáticamente cuando detecta el código QR
         searchProduct(qrCodeMessage); // Realizamos la búsqueda con el código detectado
@@ -59,7 +59,7 @@ const Camera = () => {
         scanner.current.clear();
       }
     };
-  }, [product]);
+  }, []);
 
   const submitForm = () => {
     // Realiza el submit programático o acción deseada
@@ -86,24 +86,28 @@ const Camera = () => {
   };
 
   // Función para manejar el cambio en el input manual
-  // const handleCodigoManualChange = (e) => {
-  //   setCodigoManual(e.target.value);
-  // };
+  const handleCodigoManualChange = (e) => {
+    setCodigoManual(e.target.value);
+  };
 
   // Función para manejar el evento al presionar "Enter" en el input
-  // const handleManualSubmit = (e) => {
-  //   if (e.key === "Enter" || !e.key) {
-  //     // Si es un "Enter" o la llamada manual desde el QR
-  //     searchProduct(codigoManual); // Buscar el producto con el código manual
-  //     setCodigoManual(""); // Limpiar el input después de la búsqueda
-  //   }
-  // };
+  const handleManualSubmit = (e) => {
+    if (e.key === "Enter" || !e.key) {
+      //  Si es un "Enter" o la llamada manual desde el QR
+      searchProduct(codigoManual); //Buscar el producto con el código manual
+      setCodigoManual(""); // Limpiar el input después de la búsqueda
+    }
+  };
 
   // Función para reiniciar la vista y volver al escáner
   const handleBackToScanner = () => {
     setProduct(null); // Limpiar el producto encontrado
     setQrCode(null); // Limpiar el código QR detectado
   };
+
+  if (product) {
+    alert("tenemos un producto");
+  }
 
   return (
     <div>
@@ -135,8 +139,8 @@ const Camera = () => {
           <input
             type="text"
             value={codigoManual}
-            // onChange={handleCodigoManualChange}
-            // onKeyPress={handleManualSubmit} // Ejecutar la búsqueda al presionar "Enter"
+            onChange={handleCodigoManualChange}
+            onKeyPress={handleManualSubmit} // Ejecutar la búsqueda al presionar "Enter"
             placeholder="Ingrese el código del producto"
             style={{ marginTop: "20px", padding: "8px", fontSize: "16px" }}
           />
