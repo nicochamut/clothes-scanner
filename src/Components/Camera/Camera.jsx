@@ -27,51 +27,41 @@ const Camera = () => {
 
     loadJsonData(); // Llamada a la función para cargar el JSON
 
-    console.log("Intentando inicializar el escáner...");
+    // Inicializar el escáner
+    scanner.current = new Html5QrcodeScanner(
+      "qr-reader",
+      {
+        fps: 10,
+        qrbox: 250,
+      },
+      false
+    );
 
-    const qrReaderElement = document.getElementById("qr-reader");
-
-    if (qrReaderElement) {
-      console.log("Elemento encontrado, inicializando escáner.");
-      scanner.current = new Html5QrcodeScanner(
-        "qr-reader",
-        {
-          fps: 10,
-          qrbox: 250,
-        },
-        false
-      );
-
-      scanner.current.render(
-        (qrCodeMessage) => {
-          console.log("Código QR detectado:", qrCodeMessage);
-
-          if (!qrCodeMessage) {
-            console.warn("Código QR vacío o inválido detectado.");
-            return;
-          }
-
-          // Colocar el código QR detectado en el input manual
-          setCodigoManual(qrCodeMessage);
-
-          // Simular la acción de presionar "Enter" automáticamente
-          handleManualSubmit();
-        },
-        (errorMessage) => {
-          console.log(`Error al escanear: ${errorMessage}`);
+    scanner.current.render(
+      (qrCodeMessage) => {
+        console.log("Código QR detectado:", qrCodeMessage);
+        if (qrCodeMessage) {
+          setCodigoManual(qrCodeMessage); // Actualizar el estado con el código detectado
         }
-      );
-    } else {
-      console.error("Elemento con id=qr-reader no encontrado en el DOM.");
-    }
+      },
+      (errorMessage) => {
+        console.log(`Error al escanear: ${errorMessage}`);
+      }
+    );
 
     return () => {
       if (scanner.current) {
-        console.log("Limpiando escáner...");
         scanner.current.clear();
       }
     };
   }, []);
+
+  // Buscar el producto automáticamente cuando el código manual cambia
+  useEffect(() => {
+    if (codigoManual) {
+      handleManualSubmit(); // Llamar a la función de búsqueda cuando se actualiza el código
+    }
+  }, [codigoManual]);
 
   // Función para buscar el producto en el archivo JSON
   const searchProduct = (code) => {
@@ -90,12 +80,7 @@ const Camera = () => {
     }
   };
 
-  // Función para manejar el cambio en el input manual
-  const handleCodigoManualChange = (e) => {
-    setCodigoManual(e.target.value);
-  };
-
-  // Función para manejar la búsqueda manual y la automática
+  // Función para manejar la búsqueda manual y automática
   const handleManualSubmit = () => {
     if (codigoManual) {
       searchProduct(codigoManual); // Buscar el producto con el código manual
@@ -135,7 +120,7 @@ const Camera = () => {
           <input
             type="text"
             value={codigoManual}
-            onChange={handleCodigoManualChange}
+            onChange={(e) => setCodigoManual(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleManualSubmit()}
             placeholder="Ingrese el código del producto"
             style={{ marginTop: "20px", padding: "8px", fontSize: "16px" }}
