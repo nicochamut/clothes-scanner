@@ -47,6 +47,7 @@ const Camera = () => {
 
         // Llamar a la búsqueda automáticamente cuando detecta el código QR
         searchProduct(qrCodeMessage); // Realizamos la búsqueda con el código detectado
+        submitForm();
       },
       (errorMessage) => {
         console.log(`Error: ${errorMessage}`);
@@ -58,6 +59,11 @@ const Camera = () => {
       // scanner.current.clear(); // Eliminado para no detener el escáner
     };
   }, []);
+
+  const submitForm = () => {
+    // Disparar el submit programáticamente
+    qrReaderRef.current.submit();
+  };
 
   // Función para buscar el producto en el archivo JSON
   const searchProduct = (code) => {
