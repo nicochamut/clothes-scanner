@@ -45,8 +45,8 @@ const Camera = () => {
         setQrCode(qrCodeMessage); // Guardamos el código detectado
         setCodigoManual(qrCodeMessage); // Ponemos el código también en el input manual
 
-        // Realizamos la búsqueda del producto al instante con el primer código
-        searchProduct(qrCodeMessage);
+        // Llamar a la búsqueda automáticamente cuando detecta el código QR
+        searchProduct(qrCodeMessage); // Realizamos la búsqueda con el código detectado
       },
       (errorMessage) => {
         console.log(`Error: ${errorMessage}`);
