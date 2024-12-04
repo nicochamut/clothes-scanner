@@ -1,0 +1,12 @@
+[
+  { "id": "123", "name": "Producto A", "price": 10, "codebar": 77922168564 },
+  { "id": "456", "name": "Producto B", "price": 20, "codebar": 779221685654 },
+  { "id": "789", "name": "Producto C", "price": 30, "codebar": 77922168562 },
+  {
+    "codebar": 7792216856504,
+    "image": "https://i.pinimg.com/736x/2a/e6/8c/2ae68c99068bc880cd6c3cdc7990c315.jpg",
+    "descriart": "Brown Jacket",
+    "price": 65,
+    "stock": 3
+  }
+]
