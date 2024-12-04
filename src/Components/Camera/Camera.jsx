@@ -2,32 +2,36 @@ import React, { useEffect, useRef, useState } from "react";
 
 const Camera = () => {
   const [hasPermission, setHasPermission] = useState(false); // Para manejar permisos
+  const [videoError, setVideoError] = useState(false); // Manejo de errores de video
   const videoRef = useRef(null);
 
   useEffect(() => {
-    // Solicitar acceso a la cámara
     const getCamera = async () => {
       try {
-        // Acceder a la cámara
+        // Solicitar acceso a la cámara
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
         });
 
-        // Asignar la transmisión al videoRef para mostrar en el componente
+        // Asignar la transmisión al videoRef
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          // Asegurarse de que la transmisión comienza correctamente
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current.play(); // Reproducir el video una vez cargado
+          };
         }
 
-        setHasPermission(true); // Si se obtuvo acceso, actualizar el estado
+        setHasPermission(true); // Permiso concedido
       } catch (err) {
         console.error("Error al acceder a la cámara: ", err);
-        setHasPermission(false); // Si hay error (por ejemplo, sin permisos)
+        setVideoError(true); // Si ocurre un error, mostrar mensaje
+        setHasPermission(false); // No se pudo acceder
       }
     };
 
     getCamera();
 
-    // Limpiar la transmisión cuando el componente se desmonte
     return () => {
       if (videoRef.current) {
         const stream = videoRef.current.srcObject;
@@ -42,6 +46,12 @@ const Camera = () => {
   return (
     <div>
       <h1>Cámara del dispositivo</h1>
+      {videoError && (
+        <p>
+          Error al acceder a la cámara. Asegúrese de haber concedido los
+          permisos necesarios.
+        </p>
+      )}
       {hasPermission ? (
         <video ref={videoRef} autoPlay playsInline width="100%" height="auto" />
       ) : (
