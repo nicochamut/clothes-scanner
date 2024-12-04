@@ -37,32 +37,32 @@ const Camera = () => {
       false
     );
 
-    // Esto se ejecuta cuando el escáner detecta un código QR
+    scanner.current.render(
+      (qrCodeMessage) => {
+        console.log("Código QR detectado:", qrCodeMessage); // Depuración
 
+        setQrCode(qrCodeMessage); // Guardamos el código detectado
+        setCodigoManual(qrCodeMessage); // Ponemos el código también en el input manual
+
+        // Llamar a la búsqueda automáticamente cuando detecta el código QR
+        searchProduct(qrCodeMessage); // Realizamos la búsqueda con el código detectado
+      },
+      (errorMessage) => {
+        console.log(`Error: ${errorMessage}`);
+      }
+    );
+
+    // Limpiar el escáner al desmontarse
     return () => {
-      // No detenemos el escáner, ya que debe seguir funcionando
-      // scanner.current.clear(); // Eliminado para no detener el escáner
+      if (scanner.current) {
+        scanner.current.clear();
+      }
     };
   }, []);
 
-  scanner.current.render(
-    (qrCodeMessage) => {
-      console.log("Código QR detectado:", qrCodeMessage); // Depuración
-
-      setQrCode(qrCodeMessage); // Guardamos el código detectado
-      setCodigoManual(qrCodeMessage); // Ponemos el código también en el input manual
-
-      // Llamar a la búsqueda automáticamente cuando detecta el código QR
-      searchProduct(qrCodeMessage); // Realizamos la búsqueda con el código detectado
-    },
-    (errorMessage) => {
-      console.log(`Error: ${errorMessage}`);
-    }
-  );
-
   const submitForm = () => {
-    // Disparar el submit programáticamente
-    qrReaderRef.current.submit();
+    // Realiza el submit programático o acción deseada
+    console.log("Submit programático");
   };
 
   // Función para buscar el producto en el archivo JSON
@@ -77,7 +77,7 @@ const Camera = () => {
     if (foundProduct) {
       console.log("Producto encontrado:", foundProduct); // Depuración
       setProduct(foundProduct); // Si se encuentra el producto, lo guardamos
-      submitForm();
+      submitForm(); // Disparar el submit programáticamente si es necesario
     } else {
       setProduct(null); // Si no se encuentra el producto
       console.log("No se encontró el producto");
