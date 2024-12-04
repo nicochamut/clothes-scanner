@@ -43,9 +43,13 @@ const Camera = () => {
     scannerInstance.render(
       (qrCodeMessage) => {
         console.log("Código QR detectado:", qrCodeMessage); // Depuración
-        setQrCode(qrCodeMessage);
-        setProduct(qrCodeMessage); // Actualizar el estado con el código QR detectado
-        searchProduct(qrCodeMessage); // Buscar en el JSON el producto correspondiente
+        setQrCode(Number(qrCodeMessage)); // Actualizar el estado con el código QR detectado
+
+        // Actualizar el código manual con el valor escaneado
+        setCodigoManual(qrCodeMessage);
+
+        // Buscar el producto en el JSON
+        searchProduct(qrCodeMessage);
       },
       (errorMessage) => {
         console.log(`Error: ${errorMessage}`);
