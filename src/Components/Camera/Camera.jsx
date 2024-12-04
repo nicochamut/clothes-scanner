@@ -38,26 +38,27 @@ const Camera = () => {
     );
 
     // Esto se ejecuta cuando el escáner detecta un código QR
-    scanner.current.render(
-      (qrCodeMessage) => {
-        console.log("Código QR detectado:", qrCodeMessage); // Depuración
-
-        setQrCode(qrCodeMessage); // Guardamos el código detectado
-        setCodigoManual(qrCodeMessage); // Ponemos el código también en el input manual
-
-        // Llamar a la búsqueda automáticamente cuando detecta el código QR
-        searchProduct(qrCodeMessage); // Realizamos la búsqueda con el código detectado
-      },
-      (errorMessage) => {
-        console.log(`Error: ${errorMessage}`);
-      }
-    );
 
     return () => {
       // No detenemos el escáner, ya que debe seguir funcionando
       // scanner.current.clear(); // Eliminado para no detener el escáner
     };
   }, []);
+
+  scanner.current.render(
+    (qrCodeMessage) => {
+      console.log("Código QR detectado:", qrCodeMessage); // Depuración
+
+      setQrCode(qrCodeMessage); // Guardamos el código detectado
+      setCodigoManual(qrCodeMessage); // Ponemos el código también en el input manual
+
+      // Llamar a la búsqueda automáticamente cuando detecta el código QR
+      searchProduct(qrCodeMessage); // Realizamos la búsqueda con el código detectado
+    },
+    (errorMessage) => {
+      console.log(`Error: ${errorMessage}`);
+    }
+  );
 
   const submitForm = () => {
     // Disparar el submit programáticamente
