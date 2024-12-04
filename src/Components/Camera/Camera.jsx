@@ -7,7 +7,6 @@ const Camera = () => {
   const [product, setProduct] = useState(null); // Producto encontrado en JSON
   const [codigoManual, setCodigoManual] = useState(""); // Código ingresado manualmente
   const [jsonData, setJsonData] = useState([]); // Datos cargados del JSON
-  const [firstScanDone, setFirstScanDone] = useState(false); // Estado para saber si es la primera lectura
   const qrReaderRef = useRef(null); // Referencia al contenedor del escáner
   const scanner = useRef(null); // Referencia al escáner para controlar su instancia
 
@@ -43,15 +42,11 @@ const Camera = () => {
       (qrCodeMessage) => {
         console.log("Código QR detectado:", qrCodeMessage); // Depuración
 
-        // Si es la primera lectura, guardamos el código
-        if (!firstScanDone) {
-          setQrCode(qrCodeMessage); // Guardamos el código detectado
-          setCodigoManual(qrCodeMessage); // También lo ponemos en el input manual
-          setFirstScanDone(true); // Indicamos que la primera lectura ya se hizo
-        } else {
-          // Si ya se hizo la primera lectura, hacemos el submit con el segundo código
-          handleManualSubmit({ key: "Enter" }); // Simulamos el evento de presionar "Enter"
-        }
+        setQrCode(qrCodeMessage); // Guardamos el código detectado
+        setCodigoManual(qrCodeMessage); // Ponemos el código también en el input manual
+
+        // Realizamos la búsqueda del producto al instante con el primer código
+        searchProduct(qrCodeMessage);
       },
       (errorMessage) => {
         console.log(`Error: ${errorMessage}`);
@@ -62,7 +57,7 @@ const Camera = () => {
       // No detenemos el escáner, ya que debe seguir funcionando
       // scanner.current.clear(); // Eliminado para no detener el escáner
     };
-  }, [firstScanDone]);
+  }, []);
 
   // Función para buscar el producto en el archivo JSON
   const searchProduct = (code) => {
@@ -100,7 +95,6 @@ const Camera = () => {
   const handleBackToScanner = () => {
     setProduct(null); // Limpiar el producto encontrado
     setQrCode(null); // Limpiar el código QR detectado
-    setFirstScanDone(false); // Reiniciar la bandera de primera lectura
   };
 
   return (
