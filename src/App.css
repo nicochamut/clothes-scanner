@@ -1,0 +1,32 @@
+#qr-reader {
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #f9f9f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.detected-code {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 5px;
+}
+
+h1 {
+  text-align: center;
+  color: #4caf50;
+  font-size: 24px;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #eaeaea;
+  padding: 20px;
+}
