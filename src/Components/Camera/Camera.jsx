@@ -6,7 +6,6 @@ const Camera = () => {
   const [error, setError] = useState(null);
 
   const requestCameraAccess = () => {
-    // Verificamos si el navegador soporta getUserMedia
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       setError("El navegador no soporta acceso a la cámara.");
       return;
@@ -21,6 +20,7 @@ const Camera = () => {
         },
       })
       .then((stream) => {
+        console.log("Stream recibido:", stream); // Verifica el flujo
         setHasPermission(true); // Permiso concedido
         if (videoRef.current) {
           videoRef.current.srcObject = stream; // Establece el flujo de la cámara
@@ -31,13 +31,6 @@ const Camera = () => {
         setError("No se pudo acceder a la cámara. Verifica los permisos.");
       });
   };
-
-  useEffect(() => {
-    // Verificamos si el videoRef ya está asignado al componente de video
-    if (videoRef.current && !hasPermission) {
-      console.log("Esperando el acceso a la cámara...");
-    }
-  }, [hasPermission]);
 
   return (
     <div style={{ textAlign: "center" }}>
@@ -54,11 +47,14 @@ const Camera = () => {
             ref={videoRef}
             autoPlay
             playsInline
+            onLoadedMetadata={() => console.log("Video metadata loaded")} // Asegúrate de que el video se haya cargado
             style={{
               width: "100%",
+              height: "auto",
               maxWidth: "600px",
               border: "2px solid black",
               borderRadius: "8px",
+              backgroundColor: "black", // Asegura que no haya un fondo blanco
             }}
           />
         </div>
