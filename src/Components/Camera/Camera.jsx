@@ -60,6 +60,7 @@ const Camera = () => {
   useEffect(() => {
     if (codigoManual) {
       handleManualSubmit(); // Llamar a la función de búsqueda cuando se actualiza el código
+      setCodigoManual(null);
     }
   }, [codigoManual]);
 
