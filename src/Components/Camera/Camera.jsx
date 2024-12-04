@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 
 const Camera = () => {
   const videoRef = useRef(null);
@@ -6,24 +6,18 @@ const Camera = () => {
   const [error, setError] = useState(null);
 
   const requestCameraAccess = () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setError("El navegador no soporta acceso a la cámara.");
-      return;
-    }
-
     navigator.mediaDevices
       .getUserMedia({
         video: {
-          facingMode: "environment", // Forzar cámara trasera
+          facingMode: "environment", // Usar cámara trasera
           width: { ideal: 1280 }, // Resolución ideal
           height: { ideal: 720 }, // Resolución ideal
         },
       })
       .then((stream) => {
-        console.log("Stream recibido:", stream); // Verifica el flujo
         setHasPermission(true); // Permiso concedido
         if (videoRef.current) {
-          videoRef.current.srcObject = stream; // Establece el flujo de la cámara
+          videoRef.current.srcObject = stream; // Asignar el flujo al video
         }
       })
       .catch((err) => {
@@ -33,31 +27,51 @@ const Camera = () => {
   };
 
   return (
-    <div style={{ textAlign: "center" }}>
-      <h1>Acceso a la Cámara</h1>
+    <div style={{ position: "relative", height: "100vh", width: "100vw" }}>
+      <h1
+        style={{
+          position: "absolute",
+          top: "10px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          color: "white",
+          zIndex: 10,
+        }}
+      >
+        Acceso a la Cámara
+      </h1>
       {!hasPermission ? (
-        <>
-          <p>Para usar esta aplicación, necesitamos acceso a tu cámara.</p>
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: 10,
+          }}
+        >
+          <p style={{ color: "white" }}>
+            Para usar esta aplicación, necesitamos acceso a tu cámara.
+          </p>
           <button onClick={requestCameraAccess}>Conceder Permisos</button>
           {error && <p style={{ color: "red" }}>{error}</p>}
-        </>
-      ) : (
-        <div>
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            onLoadedMetadata={() => console.log("Video metadata loaded")} // Asegúrate de que el video se haya cargado
-            style={{
-              width: "100%",
-              height: "auto",
-              maxWidth: "600px",
-              border: "2px solid black",
-              borderRadius: "8px",
-              backgroundColor: "black", // Asegura que no haya un fondo blanco
-            }}
-          />
         </div>
+      ) : (
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover", // Esto asegura que el video ocupe toda la pantalla sin deformarse
+            backgroundColor: "black",
+            zIndex: -1, // Coloca el video detrás del contenido
+          }}
+        />
       )}
     </div>
   );
