@@ -7,6 +7,7 @@ const Camera = () => {
   const [product, setProduct] = useState(null); // Producto encontrado en JSON
   const [codigoManual, setCodigoManual] = useState(""); // Código ingresado manualmente
   const [jsonData, setJsonData] = useState([]); // Datos cargados del JSON
+  const [firstScanDone, setFirstScanDone] = useState(false); // Estado para saber si es la primera lectura
   const [scanner, setScanner] = useState(null); // Guardamos el escáner
   const qrReaderRef = useRef(null); // Referencia al contenedor del escáner
 
@@ -43,11 +44,16 @@ const Camera = () => {
     scannerInstance.render(
       (qrCodeMessage) => {
         console.log("Código QR detectado:", qrCodeMessage); // Depuración
-        setQrCode(qrCodeMessage); // Actualizar el estado con el código QR detectado
-        setCodigoManual(qrCodeMessage); // Actualizar el código manual con el valor escaneado
 
-        // Realizar la búsqueda directamente sin simular un "Enter"
-        searchProduct(qrCodeMessage); // Buscar el producto directamente con el código QR
+        // Si es la primera lectura, guardamos el código
+        if (!firstScanDone) {
+          setQrCode(qrCodeMessage); // Guardamos el código detectado
+          setCodigoManual(qrCodeMessage); // También lo ponemos en el input manual
+          setFirstScanDone(true); // Indicamos que la primera lectura ya se hizo
+        } else {
+          // Si ya se hizo la primera lectura, hacemos el submit
+          handleManualSubmit({ key: "Enter" }); // Simulamos el evento de presionar "Enter"
+        }
       },
       (errorMessage) => {
         console.log(`Error: ${errorMessage}`);
@@ -57,15 +63,15 @@ const Camera = () => {
     return () => {
       scannerInstance.clear(); // Detener el escáner al desmontar el componente
     };
-  }, []);
+  }, [firstScanDone]);
 
   // Función para buscar el producto en el archivo JSON
   const searchProduct = (code) => {
     console.log("Buscando producto para el código:", code); // Depuración
 
-    // Asegúrate de convertir ambos valores a número para la comparación
+    // Convertir el código QR y el código en JSON a números para asegurar una comparación precisa
     const foundProduct = jsonData.find(
-      (item) => Number(item.codebar) === Number(code) // Convierte ambos a números
+      (item) => Number(item.codebar) === Number(code)
     );
 
     if (foundProduct) {
@@ -95,6 +101,7 @@ const Camera = () => {
   const handleBackToScanner = () => {
     setProduct(null); // Limpiar el producto encontrado
     setQrCode(null); // Limpiar el código QR detectado
+    setFirstScanDone(false); // Reiniciar la bandera de primera lectura
   };
 
   return (
