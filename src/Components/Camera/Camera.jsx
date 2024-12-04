@@ -52,7 +52,7 @@ const Camera = () => {
           }
 
           setQrCode(qrCodeMessage); // Guardamos el código detectado
-          searchProduct(qrCodeMessage); // Llamamos a la búsqueda del producto
+          searchProduct(Number(qrCodeMessage)); // Llamamos a la búsqueda del producto
         },
         (errorMessage) => {
           console.log(`Error al escanear: ${errorMessage}`);
