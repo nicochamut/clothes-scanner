@@ -8,8 +8,8 @@ const Camera = () => {
   const [codigoManual, setCodigoManual] = useState(""); // Código ingresado manualmente
   const [jsonData, setJsonData] = useState([]); // Datos cargados del JSON
   const [firstScanDone, setFirstScanDone] = useState(false); // Estado para saber si es la primera lectura
-  const [scanner, setScanner] = useState(null); // Guardamos el escáner
   const qrReaderRef = useRef(null); // Referencia al contenedor del escáner
+  const scanner = useRef(null); // Referencia al escáner para controlar su instancia
 
   useEffect(() => {
     // Cargar el archivo data.json desde la carpeta public
@@ -29,7 +29,7 @@ const Camera = () => {
     loadJsonData(); // Llamada a la función para cargar el JSON
 
     // Iniciar el escáner de código QR
-    const scannerInstance = new Html5QrcodeScanner(
+    scanner.current = new Html5QrcodeScanner(
       "qr-reader",
       {
         fps: 10,
@@ -38,10 +38,8 @@ const Camera = () => {
       false
     );
 
-    setScanner(scannerInstance);
-
     // Esto se ejecuta cuando el escáner detecta un código QR
-    scannerInstance.render(
+    scanner.current.render(
       (qrCodeMessage) => {
         console.log("Código QR detectado:", qrCodeMessage); // Depuración
 
@@ -51,7 +49,7 @@ const Camera = () => {
           setCodigoManual(qrCodeMessage); // También lo ponemos en el input manual
           setFirstScanDone(true); // Indicamos que la primera lectura ya se hizo
         } else {
-          // Si ya se hizo la primera lectura, hacemos el submit
+          // Si ya se hizo la primera lectura, hacemos el submit con el segundo código
           handleManualSubmit({ key: "Enter" }); // Simulamos el evento de presionar "Enter"
         }
       },
@@ -61,7 +59,8 @@ const Camera = () => {
     );
 
     return () => {
-      scannerInstance.clear(); // Detener el escáner al desmontar el componente
+      // No detenemos el escáner, ya que debe seguir funcionando
+      // scanner.current.clear(); // Eliminado para no detener el escáner
     };
   }, [firstScanDone]);
 
