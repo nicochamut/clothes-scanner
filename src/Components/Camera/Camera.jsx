@@ -7,17 +7,14 @@ const Camera = () => {
   const [product, setProduct] = useState(null); // Producto encontrado en JSON
   const [codigoManual, setCodigoManual] = useState(""); // Código ingresado manualmente
   const [jsonData, setJsonData] = useState([]); // Datos cargados del JSON
-  const qrReaderRef = useRef(null); // Referencia al contenedor del escáner
   const scanner = useRef(null); // Referencia al escáner para controlar su instancia
 
+  // Función para cargar el JSON
   useEffect(() => {
-    // Cargar el archivo data.json desde la carpeta public
     const loadJsonData = async () => {
       try {
         const response = await fetch("/data.json");
-        if (!response.ok) {
-          throw new Error("Error en la respuesta de la red");
-        }
+        if (!response.ok) throw new Error("Error en la respuesta de la red");
         const data = await response.json();
         setJsonData(data);
       } catch (error) {
@@ -25,9 +22,12 @@ const Camera = () => {
       }
     };
 
-    loadJsonData(); // Llamada a la función para cargar el JSON
+    loadJsonData();
+  }, []);
 
-    // Inicializar el escáner
+  // Función para inicializar el escáner
+  const startScanner = () => {
+    if (scanner.current) return; // Evitar múltiples inicializaciones
     scanner.current = new Html5QrcodeScanner(
       "qr-reader",
       {
@@ -40,34 +40,33 @@ const Camera = () => {
     scanner.current.render(
       (qrCodeMessage) => {
         console.log("Código QR detectado:", qrCodeMessage);
-        if (qrCodeMessage) {
-          setCodigoManual(qrCodeMessage); // Actualizar el estado con el código detectado
-        }
+        setCodigoManual(qrCodeMessage); // Actualizar el estado con el código detectado
       },
       (errorMessage) => {
         console.log(`Error al escanear: ${errorMessage}`);
       }
     );
+  };
 
+  // Inicializar el escáner al montar
+  useEffect(() => {
+    startScanner();
     return () => {
       if (scanner.current) {
         scanner.current.clear();
+        scanner.current = null;
       }
     };
   }, []);
 
-  // Buscar el producto automáticamente cuando el código manual cambia
+  // Efecto para manejar la búsqueda automática al cambiar el código manual
   useEffect(() => {
-    if (codigoManual) {
-      handleManualSubmit(); // Llamar a la función de búsqueda cuando se actualiza el código
-      setCodigoManual(null);
-    }
+    if (codigoManual) searchProduct(codigoManual);
   }, [codigoManual]);
 
-  // Función para buscar el producto en el archivo JSON
+  // Función para buscar un producto
   const searchProduct = (code) => {
     console.log("Buscando producto para el código:", code);
-
     const foundProduct = jsonData.find(
       (item) => Number(item.codebar) === Number(code)
     );
@@ -81,18 +80,12 @@ const Camera = () => {
     }
   };
 
-  // Función para manejar la búsqueda manual y automática
-  const handleManualSubmit = () => {
-    if (codigoManual) {
-      searchProduct(codigoManual); // Buscar el producto con el código manual
-      setCodigoManual(""); // Limpiar el input después de la búsqueda
-    }
-  };
-
-  // Función para reiniciar la vista y volver al escáner
+  // Función para reiniciar el escáner y la vista
   const handleBackToScanner = () => {
     setProduct(null); // Limpiar el producto encontrado
     setQrCode(null); // Limpiar el código QR detectado
+    setCodigoManual(""); // Limpiar el código manual
+    startScanner(); // Reactivar el escáner
   };
 
   return (
@@ -112,17 +105,13 @@ const Camera = () => {
         <div>
           <h1>Escáner de Códigos QR o Ingreso Manual</h1>
 
-          <div
-            id="qr-reader"
-            ref={qrReaderRef}
-            style={{ width: "100%", height: "400px" }}
-          ></div>
+          <div id="qr-reader" style={{ width: "100%", height: "400px" }}></div>
 
           <input
             type="text"
             value={codigoManual}
             onChange={(e) => setCodigoManual(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleManualSubmit()}
+            onKeyPress={(e) => e.key === "Enter" && searchProduct(codigoManual)}
             placeholder="Ingrese el código del producto"
             style={{ marginTop: "20px", padding: "8px", fontSize: "16px" }}
           />
