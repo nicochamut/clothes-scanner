@@ -1,10 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const CameraComponent = () => {
+const Camera = () => {
   const [hasPermission, setHasPermission] = useState(false);
   const [images, setImages] = useState([]);
+  const [logs, setLogs] = useState([]); // Para almacenar los logs
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+
+  const log = (message) => {
+    // Añadir el mensaje al estado de logs
+    setLogs((prevLogs) => [...prevLogs, message]);
+  };
 
   useEffect(() => {
     const getCamera = async () => {
@@ -16,9 +22,11 @@ const CameraComponent = () => {
           videoRef.current.srcObject = stream;
         }
         setHasPermission(true);
+        log("Cámara accedida con éxito.");
       } catch (err) {
         console.error("Error al acceder a la cámara: ", err);
         setHasPermission(false);
+        log("Error al acceder a la cámara.");
       }
     };
 
@@ -38,6 +46,7 @@ const CameraComponent = () => {
 
         // Generar imagen base64
         const imageUrl = canvas.toDataURL("image/png");
+        log("Imagen capturada.");
 
         // Guardar imagen
         setImages((prevImages) => [...prevImages, imageUrl]);
@@ -80,8 +89,27 @@ const CameraComponent = () => {
       ) : (
         <p>No se ha otorgado permiso para acceder a la cámara.</p>
       )}
+
+      <div
+        style={{
+          marginTop: "20px",
+          padding: "10px",
+          border: "2px solid #ccc",
+          borderRadius: "5px",
+          maxHeight: "200px",
+          overflowY: "scroll",
+          backgroundColor: "#f9f9f9",
+        }}
+      >
+        <h3>Console Log:</h3>
+        <div>
+          {logs.map((logMessage, index) => (
+            <p key={index}>{logMessage}</p>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default CameraComponent;
+export default Camera;
