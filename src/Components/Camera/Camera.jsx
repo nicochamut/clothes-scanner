@@ -1,51 +1,38 @@
-import React, { useState } from "react";
-import QrReader from "react-qr-barcode-scanner";
+import React, { useEffect } from "react";
+import { Html5QrcodeScanner } from "html5-qrcode";
 
 const Camera = () => {
-  const [scannedCode, setScannedCode] = useState(null);
-  const [debugLog, setDebugLog] = useState(""); // Logs de depuración
+  useEffect(() => {
+    // Configurar el escáner de código QR
+    const scanner = new Html5QrcodeScanner(
+      "qr-reader",
+      {
+        fps: 10, // Frames por segundo para el escaneo
+        qrbox: 250, // Tamaño de la caja de escaneo
+      },
+      false
+    );
 
-  const handleScan = (data) => {
-    if (data) {
-      setScannedCode(data.text); // Almacena el código escaneado
-      setDebugLog(`Código detectado: ${data.text}`);
-    }
-  };
+    // Iniciar el escáner
+    scanner.render(
+      (qrCodeMessage) => {
+        console.log(`Código QR detectado: ${qrCodeMessage}`);
+      },
+      (errorMessage) => {
+        console.log(`Error: ${errorMessage}`);
+      }
+    );
 
-  const handleError = (err) => {
-    setDebugLog(`Error: ${err}`);
-  };
+    return () => {
+      // Detener el escáner al desmontar el componente
+      scanner.clear();
+    };
+  }, []);
 
   return (
     <div>
-      <h1>Escáner de Códigos de Barras / QR</h1>
-      <QrReader
-        delay={300} // Tiempo de retraso entre escaneos (en milisegundos)
-        style={{ width: "100%" }}
-        onScan={handleScan}
-        onError={handleError}
-      />
-
-      <h2>Código escaneado:</h2>
-      {scannedCode ? (
-        <div>
-          <p>{scannedCode}</p>
-        </div>
-      ) : (
-        <p>No se ha escaneado ningún código aún.</p>
-      )}
-
-      <h2>Logs de depuración:</h2>
-      <div
-        style={{
-          whiteSpace: "pre-wrap",
-          marginTop: "20px",
-          border: "1px solid black",
-          padding: "10px",
-        }}
-      >
-        {debugLog}
-      </div>
+      <h1>Escáner de Códigos QR</h1>
+      <div id="qr-reader" style={{ width: "100%", height: "400px" }}></div>
     </div>
   );
 };
