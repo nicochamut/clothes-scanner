@@ -6,11 +6,16 @@ const Camera = () => {
   const [error, setError] = useState(null);
 
   const requestCameraAccess = () => {
-    // Solicita acceso a la cámara con la cámara trasera (facingMode: "environment") y una resolución adecuada
+    // Verificamos si el navegador soporta getUserMedia
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setError("El navegador no soporta acceso a la cámara.");
+      return;
+    }
+
     navigator.mediaDevices
       .getUserMedia({
         video: {
-          facingMode: "environment", // Cámara trasera en dispositivos móviles
+          facingMode: "environment", // Forzar cámara trasera
           width: { ideal: 1280 }, // Resolución ideal
           height: { ideal: 720 }, // Resolución ideal
         },
@@ -18,7 +23,7 @@ const Camera = () => {
       .then((stream) => {
         setHasPermission(true); // Permiso concedido
         if (videoRef.current) {
-          videoRef.current.srcObject = stream; // Muestra el video en el elemento <video>
+          videoRef.current.srcObject = stream; // Establece el flujo de la cámara
         }
       })
       .catch((err) => {
@@ -26,6 +31,13 @@ const Camera = () => {
         setError("No se pudo acceder a la cámara. Verifica los permisos.");
       });
   };
+
+  useEffect(() => {
+    // Verificamos si el videoRef ya está asignado al componente de video
+    if (videoRef.current && !hasPermission) {
+      console.log("Esperando el acceso a la cámara...");
+    }
+  }, [hasPermission]);
 
   return (
     <div style={{ textAlign: "center" }}>
