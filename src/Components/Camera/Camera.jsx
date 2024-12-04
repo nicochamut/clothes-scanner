@@ -43,13 +43,11 @@ const Camera = () => {
     scannerInstance.render(
       (qrCodeMessage) => {
         console.log("Código QR detectado:", qrCodeMessage); // Depuración
-        setQrCode(Number(qrCodeMessage)); // Actualizar el estado con el código QR detectado
+        setQrCode(qrCodeMessage); // Actualizar el estado con el código QR detectado
+        setCodigoManual(qrCodeMessage); // Actualizar el código manual con el valor escaneado
 
-        // Actualizar el código manual con el valor escaneado
-        setCodigoManual(qrCodeMessage);
-
-        // Realizar submit automático
-        handleManualSubmit({ key: "Enter" }); // Simulamos el evento de presionar "Enter"
+        // Realizar la búsqueda directamente sin simular un "Enter"
+        searchProduct(qrCodeMessage); // Buscar el producto directamente con el código QR
       },
       (errorMessage) => {
         console.log(`Error: ${errorMessage}`);
@@ -65,9 +63,9 @@ const Camera = () => {
   const searchProduct = (code) => {
     console.log("Buscando producto para el código:", code); // Depuración
 
-    // Convertir el código QR y el código en JSON a números para asegurar una comparación precisa
+    // Asegúrate de convertir ambos valores a número para la comparación
     const foundProduct = jsonData.find(
-      (item) => Number(item.codebar) === Number(code)
+      (item) => Number(item.codebar) === Number(code) // Convierte ambos a números
     );
 
     if (foundProduct) {
