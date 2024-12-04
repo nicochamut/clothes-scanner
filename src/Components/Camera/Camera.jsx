@@ -42,6 +42,7 @@ const Camera = () => {
     // Esto se ejecuta cuando el escáner detecta un código QR
     scannerInstance.render(
       (qrCodeMessage) => {
+        console.log("Código QR detectado:", qrCodeMessage); // Depuración
         setQrCode(qrCodeMessage); // Actualizar el estado con el código QR detectado
         searchProduct(qrCodeMessage); // Buscar en el JSON el producto correspondiente
       },
@@ -57,7 +58,7 @@ const Camera = () => {
 
   // Función para buscar el producto en el archivo JSON
   const searchProduct = (code) => {
-    console.log("Código buscado:", code);
+    console.log("Buscando producto para el código:", code); // Depuración
 
     // Convertir el código QR y el código en JSON a números para asegurar una comparación precisa
     const foundProduct = jsonData.find(
@@ -65,6 +66,7 @@ const Camera = () => {
     );
 
     if (foundProduct) {
+      console.log("Producto encontrado:", foundProduct); // Depuración
       setProduct(foundProduct); // Si se encuentra el producto, lo guardamos
     } else {
       setProduct(null); // Si no se encuentra el producto
@@ -90,25 +92,6 @@ const Camera = () => {
     setProduct(null); // Limpiar el producto encontrado
     setQrCode(null); // Limpiar el código QR detectado
   };
-
-  // Iniciar el escáner solo cuando el contenedor qr-reader esté disponible
-  useEffect(() => {
-    if (qrReaderRef.current && !scanner) return; // Esperar a que qrReaderRef esté disponible
-
-    if (product === null && scanner) {
-      // Cuando el producto es nulo (lo que significa que no estamos mostrando el ProductDetails),
-      // reiniciamos el escáner
-      scanner.render(
-        (qrCodeMessage) => {
-          setQrCode(qrCodeMessage); // Actualizar el estado con el código QR detectado
-          searchProduct(qrCodeMessage); // Buscar en el JSON el producto correspondiente
-        },
-        (errorMessage) => {
-          console.log(`Error: ${errorMessage}`);
-        }
-      );
-    }
-  }, [product, scanner]);
 
   return (
     <div>
