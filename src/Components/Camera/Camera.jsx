@@ -1,55 +1,49 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const Camera = () => {
-  const [hasPermission, setHasPermission] = useState(false); // Para manejar permisos
-  const [images, setImages] = useState([]); // Para almacenar las imágenes capturadas
+const CameraComponent = () => {
+  const [hasPermission, setHasPermission] = useState(false);
+  const [images, setImages] = useState([]);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const getCamera = async () => {
       try {
-        // Solicitar acceso a la cámara
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
         });
-
-        // Asignar la transmisión al videoRef
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-
-        setHasPermission(true); // Permiso concedido
+        setHasPermission(true);
       } catch (err) {
         console.error("Error al acceder a la cámara: ", err);
-        setHasPermission(false); // No se pudo acceder
+        setHasPermission(false);
       }
     };
 
     getCamera();
 
-    // Capturar una imagen cada 10 segundos
     const captureImage = setInterval(() => {
       if (videoRef.current && canvasRef.current) {
         const canvas = canvasRef.current;
+        const video = videoRef.current;
+
+        // Asegurarse de que el canvas tenga las mismas dimensiones que el video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
         const context = canvas.getContext("2d");
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Establecer el tamaño del canvas al tamaño del video
-        canvas.width = videoRef.current.videoWidth;
-        canvas.height = videoRef.current.videoHeight;
-
-        // Dibujar el frame actual del video en el canvas
-        context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
-        // Convertir el canvas a una imagen en formato base64
+        // Generar imagen base64
         const imageUrl = canvas.toDataURL("image/png");
 
-        // Almacenar la imagen capturada en el estado
+        // Guardar imagen
         setImages((prevImages) => [...prevImages, imageUrl]);
       }
     }, 10000); // Captura cada 10 segundos
 
-    // Limpiar el intervalo cuando el componente se desmonte
     return () => clearInterval(captureImage);
   }, []);
 
@@ -62,12 +56,10 @@ const Camera = () => {
             ref={videoRef}
             autoPlay
             playsInline
-            width="100%"
-            height="auto"
-            style={{ display: "none" }} // Esconder el video en vivo
+            style={{ display: "none" }} // Ocultar video
           />
           <canvas ref={canvasRef} style={{ display: "none" }} />{" "}
-          {/* Canvas oculto */}
+          {/* Ocultar canvas */}
           <h2>Imágenes Capturadas:</h2>
           <div>
             {images.map((image, index) => (
@@ -75,8 +67,12 @@ const Camera = () => {
                 key={index}
                 src={image}
                 alt={`Captured ${index}`}
-                width="200"
-                height="auto"
+                style={{
+                  width: "200px",
+                  margin: "10px",
+                  border: "1px solid #ccc",
+                  borderRadius: "5px",
+                }}
               />
             ))}
           </div>
@@ -88,4 +84,4 @@ const Camera = () => {
   );
 };
 
-export default Camera;
+export default CameraComponent;
