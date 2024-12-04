@@ -38,18 +38,20 @@ const Camera = () => {
         const video = videoRef.current;
 
         // Asegurarse de que el canvas tenga las mismas dimensiones que el video
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        if (video.videoWidth && video.videoHeight) {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
 
-        const context = canvas.getContext("2d");
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const context = canvas.getContext("2d");
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Generar imagen base64
-        const imageUrl = canvas.toDataURL("image/png");
-        log("Imagen capturada.");
+          // Generar imagen base64
+          const imageUrl = canvas.toDataURL("image/png");
+          log("Imagen capturada.");
 
-        // Guardar imagen
-        setImages((prevImages) => [...prevImages, imageUrl]);
+          // Guardar imagen
+          setImages((prevImages) => [...prevImages, imageUrl]);
+        }
       }
     }, 10000); // Captura cada 10 segundos
 
@@ -65,7 +67,7 @@ const Camera = () => {
             ref={videoRef}
             autoPlay
             playsInline
-            style={{ display: "none" }} // Ocultar video
+            style={{ width: "100%", border: "1px solid black" }} // Muestra el video en el navegador
           />
           <canvas ref={canvasRef} style={{ display: "none" }} />{" "}
           {/* Ocultar canvas */}
