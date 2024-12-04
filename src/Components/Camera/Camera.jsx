@@ -48,8 +48,8 @@ const Camera = () => {
         // Actualizar el código manual con el valor escaneado
         setCodigoManual(qrCodeMessage);
 
-        // Buscar el producto en el JSON
-        searchProduct(qrCodeMessage);
+        // Realizar submit automático
+        handleManualSubmit({ key: "Enter" }); // Simulamos el evento de presionar "Enter"
       },
       (errorMessage) => {
         console.log(`Error: ${errorMessage}`);
@@ -86,7 +86,8 @@ const Camera = () => {
 
   // Función para manejar el evento al presionar "Enter" en el input
   const handleManualSubmit = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" || !e.key) {
+      // Si es un "Enter" o la llamada manual desde el QR
       searchProduct(codigoManual); // Buscar el producto con el código manual
       setCodigoManual(""); // Limpiar el input después de la búsqueda
     }
