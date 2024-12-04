@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import ProductDetails from "../ProductDetails/ProductDetails";
 
@@ -7,6 +7,8 @@ const Camera = () => {
   const [product, setProduct] = useState(null); // Producto encontrado en JSON
   const [codigoManual, setCodigoManual] = useState(""); // Código ingresado manualmente
   const [jsonData, setJsonData] = useState([]); // Datos cargados del JSON
+  const [scanner, setScanner] = useState(null); // Guardamos el escáner
+  const qrReaderRef = useRef(null); // Referencia al contenedor del escáner
 
   useEffect(() => {
     // Cargar el archivo data.json desde la carpeta public
@@ -26,7 +28,7 @@ const Camera = () => {
     loadJsonData(); // Llamada a la función para cargar el JSON
 
     // Iniciar el escáner de código QR
-    const scanner = new Html5QrcodeScanner(
+    const scannerInstance = new Html5QrcodeScanner(
       "qr-reader",
       {
         fps: 10,
@@ -35,7 +37,10 @@ const Camera = () => {
       false
     );
 
-    scanner.render(
+    setScanner(scannerInstance);
+
+    // Esto se ejecuta cuando el escáner detecta un código QR
+    scannerInstance.render(
       (qrCodeMessage) => {
         setQrCode(qrCodeMessage); // Actualizar el estado con el código QR detectado
         searchProduct(qrCodeMessage); // Buscar en el JSON el producto correspondiente
@@ -46,7 +51,7 @@ const Camera = () => {
     );
 
     return () => {
-      scanner.clear(); // Detener el escáner al desmontar el componente
+      scannerInstance.clear(); // Detener el escáner al desmontar el componente
     };
   }, []);
 
@@ -54,7 +59,7 @@ const Camera = () => {
   const searchProduct = (code) => {
     console.log("Código buscado:", code);
 
-    // Asegurar que ambos valores sean números y compararlos
+    // Convertir el código QR y el código en JSON a números para asegurar una comparación precisa
     const foundProduct = jsonData.find(
       (item) => Number(item.codebar) === Number(code)
     );
@@ -86,6 +91,25 @@ const Camera = () => {
     setQrCode(null); // Limpiar el código QR detectado
   };
 
+  // Iniciar el escáner solo cuando el contenedor qr-reader esté disponible
+  useEffect(() => {
+    if (qrReaderRef.current && !scanner) return; // Esperar a que qrReaderRef esté disponible
+
+    if (product === null && scanner) {
+      // Cuando el producto es nulo (lo que significa que no estamos mostrando el ProductDetails),
+      // reiniciamos el escáner
+      scanner.render(
+        (qrCodeMessage) => {
+          setQrCode(qrCodeMessage); // Actualizar el estado con el código QR detectado
+          searchProduct(qrCodeMessage); // Buscar en el JSON el producto correspondiente
+        },
+        (errorMessage) => {
+          console.log(`Error: ${errorMessage}`);
+        }
+      );
+    }
+  }, [product, scanner]);
+
   return (
     <div>
       {/* Solo mostramos ProductDetails cuando se haya encontrado un producto */}
@@ -106,7 +130,11 @@ const Camera = () => {
           <h1>Escáner de Códigos QR o Ingreso Manual</h1>
 
           {/* Área para escanear QR */}
-          <div id="qr-reader" style={{ width: "100%", height: "400px" }}></div>
+          <div
+            id="qr-reader"
+            ref={qrReaderRef}
+            style={{ width: "100%", height: "400px" }}
+          ></div>
 
           {/* Campo de entrada para código manual */}
           <input
