@@ -1,62 +1,32 @@
-import React, { useState, useRef, useEffect } from "react";
-import Webcam from "react-webcam";
-import jsQR from "jsqr";
+import React, { useState } from "react";
+import QrReader from "react-qr-barcode-scanner";
 
-const CameraComponent = () => {
+const Camera = () => {
   const [scannedCode, setScannedCode] = useState(null);
-  const [debugLog, setDebugLog] = useState(""); // Estado para los logs
-  const webcamRef = useRef(null);
+  const [debugLog, setDebugLog] = useState(""); // Logs de depuración
 
-  const handleScan = () => {
-    const video = webcamRef.current?.video;
-
-    if (video) {
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("2d");
-
-      // Establecer las dimensiones del canvas según el video
-      canvas.height = video.videoHeight;
-      canvas.width = video.videoWidth;
-
-      // Dibujar el frame actual del video en el canvas
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Obtener los datos de la imagen del canvas
-      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-      if (code) {
-        setDebugLog(`Código detectado: ${code.data}`); // Mostrar log de éxito
-        setScannedCode(code.data); // Almacenar el código escaneado
-      } else {
-        setDebugLog("No se detectó ningún código"); // Mostrar log si no se detecta nada
-      }
+  const handleScan = (data) => {
+    if (data) {
+      setScannedCode(data.text); // Almacena el código escaneado
+      setDebugLog(`Código detectado: ${data.text}`);
     }
   };
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      handleScan();
-    }, 5000); // Escanea cada 10 segundos
-
-    return () => clearInterval(intervalId);
-  }, []);
+  const handleError = (err) => {
+    setDebugLog(`Error: ${err}`);
+  };
 
   return (
     <div>
-      <h1>Cámara del dispositivo</h1>
-      <div style={{ width: "100%", height: "400px" }}>
-        <Webcam
-          audio={false}
-          ref={webcamRef}
-          screenshotFormat="image/jpeg"
-          videoConstraints={{
-            facingMode: "environment", // Usa la cámara trasera en móviles
-          }}
-        />
-      </div>
+      <h1>Escáner de Códigos de Barras / QR</h1>
+      <QrReader
+        delay={300} // Tiempo de retraso entre escaneos (en milisegundos)
+        style={{ width: "100%" }}
+        onScan={handleScan}
+        onError={handleError}
+      />
 
-      <h2>Código de barras escaneado:</h2>
+      <h2>Código escaneado:</h2>
       {scannedCode ? (
         <div>
           <p>{scannedCode}</p>
@@ -74,10 +44,10 @@ const CameraComponent = () => {
           padding: "10px",
         }}
       >
-        {debugLog} {/* Mostrar los logs aquí */}
+        {debugLog}
       </div>
     </div>
   );
 };
 
-export default CameraComponent;
+export default Camera;
