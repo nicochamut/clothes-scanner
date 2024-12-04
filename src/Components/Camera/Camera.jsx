@@ -6,12 +6,19 @@ const Camera = () => {
   const [error, setError] = useState(null);
 
   const requestCameraAccess = () => {
+    // Solicita acceso a la cámara con la cámara trasera (facingMode: "environment") y una resolución adecuada
     navigator.mediaDevices
-      .getUserMedia({ video: true }) // Solicita acceso a la cámara
+      .getUserMedia({
+        video: {
+          facingMode: "environment", // Cámara trasera en dispositivos móviles
+          width: { ideal: 1280 }, // Resolución ideal
+          height: { ideal: 720 }, // Resolución ideal
+        },
+      })
       .then((stream) => {
         setHasPermission(true); // Permiso concedido
         if (videoRef.current) {
-          videoRef.current.srcObject = stream; // Muestra la cámara
+          videoRef.current.srcObject = stream; // Muestra el video en el elemento <video>
         }
       })
       .catch((err) => {
