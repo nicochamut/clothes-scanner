@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import Webcam from "react-webcam";
 import jsQR from "jsqr";
 
-const Camera = () => {
+const CameraComponent = () => {
   const [scannedCode, setScannedCode] = useState(null);
+  const [debugLog, setDebugLog] = useState(""); // Estado para los logs
   const webcamRef = useRef(null);
 
   const handleScan = () => {
@@ -25,16 +26,18 @@ const Camera = () => {
       const code = jsQR(imageData.data, canvas.width, canvas.height);
 
       if (code) {
-        setScannedCode(code.data); // Almacena el código escaneado
+        setDebugLog(`Código detectado: ${code.data}`); // Mostrar log de éxito
+        setScannedCode(code.data); // Almacenar el código escaneado
+      } else {
+        setDebugLog("No se detectó ningún código"); // Mostrar log si no se detecta nada
       }
     }
   };
 
-  // Usamos useEffect para realizar un escaneo cada 10 segundos
   useEffect(() => {
     const intervalId = setInterval(() => {
       handleScan();
-    }, 10000); // Escanea cada 10 segundos
+    }, 5000); // Escanea cada 10 segundos
 
     return () => clearInterval(intervalId);
   }, []);
@@ -53,7 +56,7 @@ const Camera = () => {
         />
       </div>
 
-      <h2>Codigo de barras escaneado:</h2>
+      <h2>Código de barras escaneado:</h2>
       {scannedCode ? (
         <div>
           <p>{scannedCode}</p>
@@ -61,8 +64,20 @@ const Camera = () => {
       ) : (
         <p>No se ha escaneado ningún código aún.</p>
       )}
+
+      <h2>Logs de depuración:</h2>
+      <div
+        style={{
+          whiteSpace: "pre-wrap",
+          marginTop: "20px",
+          border: "1px solid black",
+          padding: "10px",
+        }}
+      >
+        {debugLog} {/* Mostrar los logs aquí */}
+      </div>
     </div>
   );
 };
 
-export default Camera;
+export default CameraComponent;
