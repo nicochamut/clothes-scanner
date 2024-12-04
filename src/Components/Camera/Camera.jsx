@@ -84,7 +84,7 @@ const Camera = () => {
   const handleBackToScanner = () => {
     setProduct(null); // Limpiar el producto encontrado
     setQrCode(null); // Limpiar el código QR detectado
-    setCodigoManual(""); // Limpiar el código manual
+    setCodigoManual(null); // Limpiar el código manual
     startScanner(); // Reactivar el escáner
   };
 
@@ -111,7 +111,7 @@ const Camera = () => {
             type="text"
             value={codigoManual}
             onChange={(e) => setCodigoManual(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && searchProduct(codigoManual)}
+            // onKeyPress={(e) => e.key === "Enter" && searchProduct(codigoManual)}
             placeholder="Ingrese el código del producto"
             style={{ marginTop: "20px", padding: "8px", fontSize: "16px" }}
           />
