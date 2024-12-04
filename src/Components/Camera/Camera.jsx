@@ -51,8 +51,11 @@ const Camera = () => {
             return;
           }
 
-          setQrCode(qrCodeMessage); // Guardamos el código detectado
-          searchProduct(Number(qrCodeMessage)); // Llamamos a la búsqueda del producto
+          // Colocar el código QR detectado en el input manual
+          setCodigoManual(qrCodeMessage);
+
+          // Simular la acción de presionar "Enter" automáticamente
+          handleManualSubmit();
         },
         (errorMessage) => {
           console.log(`Error al escanear: ${errorMessage}`);
@@ -92,9 +95,9 @@ const Camera = () => {
     setCodigoManual(e.target.value);
   };
 
-  // Función para manejar el evento al presionar "Enter" en el input
-  const handleManualSubmit = (e) => {
-    if (e.key === "Enter" || !e.key) {
+  // Función para manejar la búsqueda manual y la automática
+  const handleManualSubmit = () => {
+    if (codigoManual) {
       searchProduct(codigoManual); // Buscar el producto con el código manual
       setCodigoManual(""); // Limpiar el input después de la búsqueda
     }
@@ -133,7 +136,7 @@ const Camera = () => {
             type="text"
             value={codigoManual}
             onChange={handleCodigoManualChange}
-            onKeyPress={handleManualSubmit}
+            onKeyPress={(e) => e.key === "Enter" && handleManualSubmit()}
             placeholder="Ingrese el código del producto"
             style={{ marginTop: "20px", padding: "8px", fontSize: "16px" }}
           />
