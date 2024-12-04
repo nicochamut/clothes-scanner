@@ -47,7 +47,6 @@ const Camera = () => {
 
         // Llamar a la búsqueda automáticamente cuando detecta el código QR
         searchProduct(qrCodeMessage); // Realizamos la búsqueda con el código detectado
-        submitForm();
       },
       (errorMessage) => {
         console.log(`Error: ${errorMessage}`);
@@ -77,6 +76,7 @@ const Camera = () => {
     if (foundProduct) {
       console.log("Producto encontrado:", foundProduct); // Depuración
       setProduct(foundProduct); // Si se encuentra el producto, lo guardamos
+      submitForm();
     } else {
       setProduct(null); // Si no se encuentra el producto
       console.log("No se encontró el producto");
